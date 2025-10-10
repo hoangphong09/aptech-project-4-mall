@@ -152,7 +152,7 @@ export default function ProductGrid({ title, productIds, showBanner = true }: Pr
                 </h3>
 
                 <div className="flex items-center gap-2 mb-2 text-xs">
-                  {product.discount > 0 && (
+                  {product.discount && product.discount > 0 && (
                     <span className="bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-200">
                       {product.discount}% {t("buyAgain")}
                     </span>

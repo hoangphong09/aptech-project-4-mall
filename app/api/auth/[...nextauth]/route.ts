@@ -26,6 +26,7 @@ export const authOptions : AuthOptions = {
                 if (json){
                     const accessToken = json.token;
                     const decodedPayload = jwtDecode<DecodedToken & { sub: string, exp: number }>(accessToken);
+
                     return {
                         id: String(json.id || decodedPayload.sub), 
                         username : decodedPayload.sub,
@@ -42,20 +43,26 @@ export const authOptions : AuthOptions = {
 
     callbacks: {
         async jwt({token, user, account}){
-            if (user && account) {
-                console.log(account);
-                return {...token, ...user} as unknown as CustomToken;
+            if (user) {
+                const customUser = user as CustomUser
+            return {
+                ...token,
+                username: customUser.username,
+                email: customUser.email,
+                roles: customUser.roles,
+                accessToken: customUser.accessToken,
+                accessTokenExpires: customUser.accessTokenExpires,
+            };
             }
-
-            const customToken = token as unknown as CustomToken;
-
-
-            return {}
+            return token;
         },
-        async session({session, token, user}){
-            session.user = token as any;
+        async session({ session, token }) {
+            if (!session.user) session.user = {} as any;
+            session.user.username = (token as any).username;
+            session.user.email = (token as any).email;
+            session.user.roles = (token as any).roles;
             return session;
-        }
+        },
     },
 
     pages: {

@@ -8,6 +8,7 @@ interface ProvidersWrapperProps {
 }
 
 export function SessionContext({ children, session }: ProvidersWrapperProps) {
+
   return (
     <SessionProvider session={session}>
         {children}

@@ -31,7 +31,7 @@ export default function LoginPage() {
       redirect: false
     })
     console.log(result);
-    if (result?.error) setError(result.error);
+    
     
     setTimeout(() => {
       // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
@@ -41,7 +41,8 @@ export default function LoginPage() {
         router.push("/")
       } else {
         setIsLoading(false)
-        setError("Email hoặc mật khẩu không đúng")
+        if (result?.error) setError(result.error);
+        else setError("Email hoặc mật khẩu không đúng");
       }
     }, 1000)
 

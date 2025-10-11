@@ -20,6 +20,7 @@ import { useState } from "react"
 import { useLanguage } from "@/contexts/language-context"
 import { useCart } from "@/contexts/cart-context"
 import type { Language } from "@/lib/translations"
+import { useLogout } from "@/lib/hooks/useLogout"
 
 export default function Header() {
   const router = useRouter()
@@ -28,6 +29,7 @@ export default function Header() {
   const { language, setLanguage, t } = useLanguage()
   const { getTotalItems } = useCart()
   const cartItemCount = getTotalItems()
+  const { handleLogout } = useLogout()
 
   const languages: { code: Language; label: string; flag: string }[] = [
     { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" },
@@ -194,8 +196,9 @@ export default function Header() {
                       </Link>
                       <div className="border-t border-gray-200 my-2" />
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
                           setShowUserMenu(false)
+                          handleLogout(e)
                           router.push("/login")
                         }}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors w-full text-left"

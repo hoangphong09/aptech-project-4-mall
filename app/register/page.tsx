@@ -7,9 +7,11 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, ShoppingBag } from "lucide-react"
-import { signIn } from "next-auth/react"
+import { axiosAuth } from "@/lib/axios"
+import { AxiosError } from 'axios';
 
-export default function LoginPage() {
+export default function RegisterPage() {
+
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
@@ -17,40 +19,30 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const DEMO_EMAIL = "demo.account@gmail.com"
-  const DEMO_PASSWORD = "demo@123"
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    const result = await signIn('credentials', {
-      username: email, 
-      password: password, 
-      redirect: false
-    })
-    console.log(result);
-    if (result?.error) setError(result.error);
-    
-    setTimeout(() => {
-      // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
-      if (result?.ok) {
-        console.log(" logged in")
-        setIsLoading(false)
-        router.push("/")
-      } else {
-        setIsLoading(false)
-        setError("Email hoặc mật khẩu không đúng")
+    try{
+        const response = await axiosAuth.post("/register", JSON.stringify({username: email, password: password}),
+        {
+          headers: {"Content-Type": "application/json"},
+          withCredentials: true
+        })
+
+      } catch(error) {
+        const err = error as AxiosError
+        if (!err?.response){
+          setError("Không nhận được phản hồi từ server")
+        } else {
+          setError(err.message)
+        }
       }
+
+    setTimeout(() => {
+      
     }, 1000)
-
-  }
-
-  const fillDemoCredentials = () => {
-    setEmail(DEMO_EMAIL)
-    setPassword(DEMO_PASSWORD)
-    setError("")
   }
 
   return (
@@ -108,27 +100,7 @@ export default function LoginPage() {
             <p className="text-gray-600">Đăng nhập để tiếp tục mua sắm</p>
           </div>
 
-          <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-orange-800 mb-1">Tài khoản demo</p>
-                <p className="text-xs text-orange-700 mb-2">
-                  Email: <span className="font-mono font-semibold">{DEMO_EMAIL}</span>
-                  <br />
-                  Mật khẩu: <span className="font-mono font-semibold">{DEMO_PASSWORD}</span>
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemoCredentials}
-                className="text-xs font-medium text-[#ff6600] hover:text-[#ff5500] underline whitespace-nowrap"
-              >
-                Điền tự động
-              </button>
-            </div>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleRegister} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email hoặc Số điện thoại
@@ -226,15 +198,15 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">Đăng nhập với Google</span>
+                <span className="text-sm font-medium text-gray-700">Đăng ký với Google</span>
               </button>
             </div>
           </div>
 
           <p className="mt-8 text-center text-sm text-gray-600">
-            Chưa có tài khoản?{" "}
-            <a onClick={() => router.push("/register")} className="text-[#ff6600] hover:text-[#ff5500] font-semibold">
-              Đăng ký ngay
+            Đã có tài khoản?{" "}
+            <a onClick={() => router.push("/login")} className="text-[#ff6600] hover:text-[#ff5500] font-semibold">
+              Đăng nhập
             </a>
           </p>
         </div>

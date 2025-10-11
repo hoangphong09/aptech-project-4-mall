@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
 import { CartProvider } from "@/contexts/cart-context"
+import { SessionContext } from "@/contexts/session-context"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,6 +17,7 @@ const robotoMono = Roboto_Mono({
 })
 
 import { Inter, Roboto_Mono, Libre_Baskerville as V0_Font_Libre_Baskerville, IBM_Plex_Mono as V0_Font_IBM_Plex_Mono, Lora as V0_Font_Lora } from 'next/font/google'
+import { ReactNode } from "react"
 
 // Initialize fonts
 const _libreBaskerville = V0_Font_Libre_Baskerville({ subsets: ['latin'], weight: ["400","700"], variable: '--v0-font-libre-baskerville' })
@@ -30,17 +32,22 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+  children, session
+}: IProps) {
   return (
     <html lang="vi" className={`${inter.variable} ${robotoMono.variable} antialiased`}>
       <body className={_v0_fontVariables}>
+        <SessionContext session={session}>
         <LanguageProvider>
           <CartProvider>{children}</CartProvider>
         </LanguageProvider>
+        </SessionContext>
       </body>
     </html>
   )
+}
+
+interface IProps {
+  children: ReactNode,
+  session: any
 }

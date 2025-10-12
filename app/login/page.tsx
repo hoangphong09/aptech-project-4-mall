@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, ShoppingBag } from "lucide-react"
 import { signIn } from "next-auth/react"
+import { axiosAuth } from "@/lib/axios"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,27 +26,42 @@ export default function LoginPage() {
     setIsLoading(true)
     setError("")
 
-    const result = await signIn('credentials', {
-      username: email, 
-      password: password, 
-      redirect: false
-    })
-    console.log(result);
-    
-    
-    setTimeout(() => {
-      // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
-      if (result?.ok) {
-        console.log(" logged in")
-        setIsLoading(false)
-        router.push("/")
-      } else {
-        setIsLoading(false)
-        if (result?.error) setError(result.error);
-        else setError("Email hoặc mật khẩu không đúng");
-      }
-    }, 1000)
+    try {
+      const res = await axiosAuth.post("/login", JSON.stringify({username: email, password: password}),
+      {
+        headers: {"Content-Type": "application/json"},
+        withCredentials: true
+      })
+                    
+      const accessToken = res.data.token;
+      const cookies = res.headers.getSetCookie;
+      console.log("Cookie values: "+cookies)
+      
+      if (res && accessToken){
+        const result = await signIn('credentials', {
+        accessToken: accessToken,
+        redirect: false
+        })
+        console.log(result);
 
+        setTimeout(() => {
+        // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
+        if (result?.ok) {
+          console.log(" logged in")
+          setIsLoading(false)
+          router.push("/")
+        } else {
+          setIsLoading(false)
+          if (result?.error) setError(result.error);
+          else setError("Email hoặc mật khẩu không đúng");
+        }
+        }, 1000)
+      }
+
+    } catch(error) {
+      console.log("Has error: "+error);
+    }
+    
   }
 
   const fillDemoCredentials = () => {

@@ -11,8 +11,9 @@ export function useLogout() {
   const handleLogout = async (e?: React.FormEvent) => {
     e?.preventDefault()
     console.log("logout clicked");
+    const token = session?.user?.accessToken
     try {
-        const token = session?.user?.accessToken
+        console.log("Login Token before Logout: " + token);
         if (token) {
             const res = await axiosPrivate.post(
                 "/logout",
@@ -32,6 +33,7 @@ export function useLogout() {
       const error = err as AxiosError
       console.error("Logout failed:", error.message)
     }
+
   }
 
   return { handleLogout }

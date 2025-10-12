@@ -17,7 +17,8 @@ export default function Home() {
   const { t } = useLanguage()
   const debugSession = useSession()
     useEffect(()=>{
-      console.log("Session Data: "+ debugSession.data?.user.username);
+      console.log("Session Username: "+ debugSession.data?.user.username);
+      console.log("Session Token: "+ debugSession.data?.user.accessToken);;
       console.log("Session Status: "+ debugSession.status);
     }, [debugSession])
 

@@ -34,8 +34,6 @@ export default function LoginPage() {
       })
                     
       const accessToken = res.data.token;
-      const cookies = res.headers.getSetCookie;
-      console.log("Cookie values: "+cookies)
       
       if (res && accessToken){
         const result = await signIn('credentials', {

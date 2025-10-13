@@ -34,7 +34,7 @@ const useAxiosPrivate = () => {
                 const statusCode = error?.response?.status;
 
                 if (
-                    (statusCode === 401 || statusCode === 403) && 
+                    (statusCode === 401) && 
                     prevRequest && 
                     !prevRequest.sent
                 ) {

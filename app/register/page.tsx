@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,10 +14,19 @@ export default function RegisterPage() {
 
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [matchPassword, setValidMatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if((password === confirmPassword) && password.length !== 0 && confirmPassword.length !== 0) setValidMatch(true)
+      else setValidMatch(false)
+  }, [password, confirmPassword])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,11 +34,17 @@ export default function RegisterPage() {
     setError("")
 
     try{
-        const response = await axiosAuth.post("/register", JSON.stringify({username: email, password: password}),
+        const response = await axiosAuth.post("/register", JSON.stringify({username: username, password: password, role: 'User', email: email}),
         {
           headers: {"Content-Type": "application/json"},
           withCredentials: true
         })
+
+        setTimeout(() => {
+          if (response){
+            router.push("/");
+          }
+        }, 1000)
 
       } catch(error) {
         const err = error as AxiosError
@@ -38,11 +53,11 @@ export default function RegisterPage() {
         } else {
           setError(err.message)
         }
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000)
       }
-
-    setTimeout(() => {
-      
-    }, 1000)
   }
 
   return (
@@ -96,11 +111,26 @@ export default function RegisterPage() {
                 <span className="text-[#ff6600]">Mall</span>
               </h2>
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Chào mừng trở lại!</h2>
-            <p className="text-gray-600">Đăng nhập để tiếp tục mua sắm</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Đăng ký tài khoản!</h2>
+            <p className="text-gray-600">Để bắt đầu đặt đơn</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                Username đăng nhập
+              </label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Nhập tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="h-12 text-base"
+                required
+              />
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email hoặc Số điện thoại
@@ -140,31 +170,42 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            <div>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
+                Nhập lại Mật khẩu
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Nhập lại mật khẩu"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="h-12 text-base pr-12"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 text-[#ff6600] focus:ring-[#ff6600]"
-                />
-                <span className="text-sm text-gray-600">Ghi nhớ đăng nhập</span>
-              </label>
-              <a href="#" className="text-sm text-[#ff6600] hover:text-[#ff5500] font-medium">
-                Quên mật khẩu?
-              </a>
-            </div>
-
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !matchPassword}
               className="w-full h-12 bg-[#ff6600] hover:bg-[#ff5500] text-white text-base font-semibold rounded-lg transition-colors"
             >
-              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+              {isLoading ? "Đang đăng ký..." : "Đăng ký"}
             </Button>
           </form>
 
@@ -174,7 +215,7 @@ export default function RegisterPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">Hoặc đăng nhập với</span>
+                <span className="px-4 bg-white text-gray-500">Hoặc đăng ký với</span>
               </div>
             </div>
 

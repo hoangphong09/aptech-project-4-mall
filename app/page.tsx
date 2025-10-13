@@ -10,17 +10,8 @@ import Footer from "@/components/footer"
 import { SAMPLE_PRODUCT_IDS } from "@/lib/api"
 import { useLanguage } from "@/contexts/language-context"
 
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-
 export default function Home() {
   const { t } = useLanguage()
-  const debugSession = useSession()
-    useEffect(()=>{
-      console.log("Session Username: "+ debugSession.data?.user.username);
-      console.log("Session Token: "+ debugSession.data?.user.accessToken);;
-      console.log("Session Status: "+ debugSession.status);
-    }, [debugSession])
 
   return (
     <div className="min-h-screen bg-background">

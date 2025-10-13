@@ -111,6 +111,8 @@ const translations = {
     orderSummary: "Tóm tắt đơn hàng",
     proceedToCheckout: "Tiến hành thanh toán",
     addedToCart: "Đã thêm vào giỏ hàng",
+    login: "Đăng Nhập",
+    register: "Đăng ký"
   },
   en: {
     home: "Home",
@@ -218,6 +220,8 @@ const translations = {
     orderSummary: "Order Summary",
     proceedToCheckout: "Proceed to Checkout",
     addedToCart: "Added to cart",
+    login: "Login",
+    register: "Register",
   },
   zh: {
     home: "首页",
@@ -324,6 +328,8 @@ const translations = {
     orderSummary: "订单摘要",
     proceedToCheckout: "去结算",
     addedToCart: "已加入购物车",
+    login: "登入",
+    register: "登記"
   },
 }
 

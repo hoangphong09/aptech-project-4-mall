@@ -7,6 +7,7 @@ import {
   Camera,
   Smartphone,
   ChevronDown,
+  LogIn,
   LogOut,
   User,
   Settings,
@@ -16,14 +17,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useLanguage } from "@/contexts/language-context"
 import { useCart } from "@/contexts/cart-context"
 import type { Language } from "@/lib/translations"
 import { useLogout } from "@/lib/hooks/useLogout"
+import { useSession } from "next-auth/react"
 
 export default function Header() {
+  const session = useSession()
   const router = useRouter()
+  const [isLoggedIn, setLoggedIn] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const { language, setLanguage, t } = useLanguage()
@@ -38,6 +42,15 @@ export default function Header() {
   ]
 
   const currentLanguage = languages.find((lang) => lang.code === language)
+
+  useEffect(() => {
+    if(session.status === 'authenticated') {
+      setLoggedIn(true)
+    } else {
+      setLoggedIn(false)
+    }
+
+  },[session, isLoggedIn])
 
   return (
     <>
@@ -161,8 +174,8 @@ export default function Header() {
                   </>
                 )}
               </div>
-
-              <div className="relative">
+              {isLoggedIn ? 
+                <div className="relative">
                 <div
                   className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-lg transition-colors"
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -170,7 +183,7 @@ export default function Header() {
                   <div className="w-9 h-9 rounded-full bg-gray-400 flex items-center justify-center text-white font-semibold">
                     P
                   </div>
-                  <span className="text-sm text-gray-700 hidden lg:inline">{t("userName")}</span>
+                  <span className="text-sm text-gray-700 hidden lg:inline">{session.data?.user.username}</span>
                   <ChevronDown className="h-4 w-4 text-gray-600 hidden lg:inline" />
                 </div>
 
@@ -199,7 +212,7 @@ export default function Header() {
                         onClick={(e) => {
                           setShowUserMenu(false)
                           handleLogout(e)
-                          router.push("/login")
+                          router.refresh
                         }}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors w-full text-left"
                       >
@@ -210,6 +223,17 @@ export default function Header() {
                   </>
                 )}
               </div>
+              : 
+              <div className="relative">
+                <span>
+                  <button onClick={() => router.push("/login")} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors w-full text-center">
+                    <LogIn className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm text-gray-600">{t("login")}</span>
+                  </button>
+                </span>  
+              </div>
+              }
+              
             </div>
           </div>
         </div>

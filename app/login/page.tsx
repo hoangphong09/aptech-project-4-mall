@@ -40,12 +40,10 @@ export default function LoginPage() {
         accessToken: accessToken,
         redirect: false
         })
-        console.log(result);
 
         setTimeout(() => {
         // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
         if (result?.ok) {
-          console.log(" logged in")
           setIsLoading(false)
           router.push("/")
         } else {

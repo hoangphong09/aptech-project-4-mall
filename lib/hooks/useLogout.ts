@@ -13,19 +13,21 @@ export function useLogout() {
     const token = session?.user?.accessToken
     try {
         if (token) {
-            const res = await axiosPrivate.post(
+          const res = await axiosPrivate.post(
                 "/logout",
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     withCredentials: true,
                 }
-        )
-      }
-        await signOut({ 
-        //callbackUrl: "/login" 
-        })
+          )
+        }
+        
     } catch (err) {
+    } finally {
+      await signOut({ 
+        //callbackUrl: "/" 
+        })
     }
 
   }

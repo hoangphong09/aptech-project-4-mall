@@ -32,19 +32,13 @@ const useAxiosPrivate = () => {
             async (error: AxiosError) => {
                 const prevRequest = error?.config as RetryAxiosRequestConfig | undefined;
                 const statusCode = error?.response?.status;
-
+            
                 if (
-                    (statusCode === 401) && 
-                    prevRequest && 
-                    !prevRequest.sent
+                    (statusCode === 401) && prevRequest && !prevRequest.sent
                 ) {
                     prevRequest.sent = true;
-                    
                     const newAccessToken = await refresh();
-
-                    if (session) {
-                        session.user.accessToken = newAccessToken;
-                    }
+                    if (session?.user) session.user.accessToken = newAccessToken;
                     
                     prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     return axiosAuth(prevRequest);

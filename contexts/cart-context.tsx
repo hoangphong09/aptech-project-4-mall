@@ -20,8 +20,8 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[]
   addToCart: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void
-  removeFromCart: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  removeFromCart: (index: number) => void
+  updateQuantity: (index: number, quantity: number) => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -55,33 +55,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (i) => i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor,
-      )
-
-      if (existingItem) {
-        return prevItems.map((i) =>
-          i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor
-            ? { ...i, quantity: i.quantity + (item.quantity || 1) }
-            : i,
-        )
-      }
-
-      return [...prevItems, { ...item, quantity: item.quantity || 1 }]
+      const newItem = { ...item, quantity: item.quantity || 1 }
+      return [...prevItems, newItem]
     })
   }
 
-  const removeFromCart = (id: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id))
+  const removeFromCart = (index: number) => {
+    setItems((prevItems) => prevItems.filter((_, i) => i !== index))
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (index: number, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(id)
+      removeFromCart(index)
       return
     }
 
-    setItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity } : item)))
+    setItems((prevItems) => prevItems.map((item, i) => (i === index ? { ...item, quantity } : item)))
   }
 
   const clearCart = () => {

@@ -17,9 +17,8 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useLanguage } from "@/contexts/language-context"
+import { useLanguage, type Language } from "@/contexts/language-context"
 import { useCart } from "@/contexts/cart-context"
-import type { Language } from "@/lib/translations"
 
 export default function Header() {
   const router = useRouter()

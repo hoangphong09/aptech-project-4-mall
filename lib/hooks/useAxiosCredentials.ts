@@ -3,6 +3,8 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import useRefreshToken from './useRefreshToken';
+import { signIn, signOut, getSession } from "next-auth/react";
+
 
 interface RetryAxiosRequestConfig extends InternalAxiosRequestConfig {
     sent?: boolean;
@@ -38,10 +40,16 @@ const useAxiosPrivate = () => {
                 ) {
                     prevRequest.sent = true;
                     const newAccessToken = await refresh();
-                    if (session?.user) session.user.accessToken = newAccessToken;
+                    if (newAccessToken === "refresh-token error") {
+                        await signOut({ callbackUrl: "/login" })
+                    } else {
+                        const updatedSession = await getSession();
+                        if (updatedSession) updatedSession.user.accessToken = newAccessToken;
                     
-                    prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                    return axiosAuth(prevRequest);
+                        prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                        return axiosAuth(prevRequest);
+                    }
+                    
                 }
                 
                 return Promise.reject(error);

@@ -13,7 +13,8 @@ const useRefreshToken = () => {
         const response = await axios.get<RefreshResponse>('/refresh', {
             withCredentials: true 
         });
-        return response.data.token; 
+        if (response.status === 200) return response.data.token; 
+        else return "refresh-token error";
     }
     
     return refresh;

@@ -3,9 +3,10 @@ import { jwtDecode } from "jwt-decode"
 import { DecodedToken, Role } from "@/lib/types/next-auth"
 
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 
 export const authOptions : AuthOptions = {
-
+    
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -23,11 +24,16 @@ export const authOptions : AuthOptions = {
                         email: decodedPayload.email,
                         roles: decodedPayload.roles,
                         accessToken: accessToken,
-                        accessTokenExpires: decodedPayload.exp * 1000
+                        accessTokenExpires: decodedPayload.exp
                     } as CustomUser
                 }
                 return null;
             },
+        }),
+        GoogleProvider({
+            name: "Google",
+            clientId: `${process.env.GOOGLE_CLIENT_ID}`,
+            clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`
         })
     ],
 

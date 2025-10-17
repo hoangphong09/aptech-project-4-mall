@@ -1,6 +1,6 @@
 import type { Product1688 } from "./api"
 import type { MultilingualProduct } from "./mock-products"
-import type { Language } from "./translations"
+import type { Language } from "../contexts/language-context"
 
 export function getTranslatedProductTitle(product: MultilingualProduct, language?: Language): string {
   switch (language) {

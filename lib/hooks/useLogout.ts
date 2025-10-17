@@ -14,7 +14,7 @@ export function useLogout() {
     try {
         if (token) {
           const res = await axiosPrivate.post(
-                "/logout",
+                "/api/auth/logout",
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },

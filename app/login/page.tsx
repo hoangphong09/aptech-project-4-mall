@@ -27,7 +27,7 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const res = await axiosAuth.post("/login", JSON.stringify({username: email, password: password}),
+      const res = await axiosAuth.post("/api/auth/login", JSON.stringify({username: email, password: password}),
       {
         headers: {"Content-Type": "application/json"},
         withCredentials: true

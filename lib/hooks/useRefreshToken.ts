@@ -10,7 +10,7 @@ const useRefreshToken = () => {
     const refresh: RefreshFunction = async () => {
         
         
-        const response = await axios.get<RefreshResponse>('/refresh', {
+        const response = await axios.get<RefreshResponse>('/api/auth/refresh', {
             withCredentials: true 
         });
         if (response.status === 200) return response.data.token; 

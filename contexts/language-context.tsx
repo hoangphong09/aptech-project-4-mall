@@ -111,10 +111,8 @@ const translations = {
     orderSummary: "Tóm tắt đơn hàng",
     proceedToCheckout: "Tiến hành thanh toán",
     addedToCart: "Đã thêm vào giỏ hàng",
-<<<<<<< HEAD
     login: "Đăng Nhập",
-    register: "Đăng ký"
-=======
+    register: "Đăng ký",
     shippingFee: "Phí vận chuyển",
     estimatedShipping: "Phí vận chuyển ước tính",
     freeShipping: "Miễn phí vận chuyển",
@@ -160,7 +158,6 @@ const translations = {
     confirmPayment: "Xác nhận thanh toán",
     vietcombank: "Vietcombank",
     orderCode: "Mã đơn hàng",
->>>>>>> upstream/main
   },
   en: {
     home: "Home",
@@ -268,10 +265,8 @@ const translations = {
     orderSummary: "Order Summary",
     proceedToCheckout: "Proceed to Checkout",
     addedToCart: "Added to cart",
-<<<<<<< HEAD
     login: "Login",
     register: "Register",
-=======
     shippingFee: "Shipping Fee",
     estimatedShipping: "Estimated Shipping",
     freeShipping: "Free Shipping",
@@ -317,7 +312,6 @@ const translations = {
     confirmPayment: "Confirm Payment",
     vietcombank: "Vietcombank",
     orderCode: "Order Code",
->>>>>>> upstream/main
   },
   zh: {
     home: "首页",
@@ -424,10 +418,8 @@ const translations = {
     orderSummary: "订单摘要",
     proceedToCheckout: "去结算",
     addedToCart: "已加入购物车",
-<<<<<<< HEAD
     login: "登入",
-    register: "登記"
-=======
+    register: "登記",
     shippingFee: "运费",
     estimatedShipping: "预计运费",
     freeShipping: "免运费",
@@ -473,7 +465,6 @@ const translations = {
     confirmPayment: "确认支付",
     vietcombank: "越南外贸银行",
     orderCode: "订单号",
->>>>>>> upstream/main
   },
 }
 

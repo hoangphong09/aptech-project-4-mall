@@ -17,18 +17,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-<<<<<<< HEAD
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/contexts/language-context"
-import { useCart } from "@/contexts/cart-context"
-import type { Language } from "@/lib/translations"
 import { useLogout } from "@/lib/hooks/useLogout"
 import { useSession } from "next-auth/react"
-=======
-import { useState } from "react"
 import { useLanguage, type Language } from "@/contexts/language-context"
 import { useCart } from "@/contexts/cart-context"
->>>>>>> upstream/main
 
 export default function Header() {
   const session = useSession()

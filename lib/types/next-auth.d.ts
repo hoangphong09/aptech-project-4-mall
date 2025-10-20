@@ -6,7 +6,7 @@ export interface Role {
 
 export interface DecodedToken {
     email: string;
-    roles: Role[]; 
+    role: Role; 
 }
 
 declare module "next-auth" {
@@ -16,7 +16,7 @@ declare module "next-auth" {
             id: string | undefined;
             username: string | undefined;
             email: string;
-            roles: Role[];
+            role: Role;
             accessToken: string;
         }
     }

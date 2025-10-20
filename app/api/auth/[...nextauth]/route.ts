@@ -22,7 +22,7 @@ export const authOptions : AuthOptions = {
                         id: String(decodedPayload.sub), 
                         username : decodedPayload.sub,
                         email: decodedPayload.email,
-                        roles: decodedPayload.roles,
+                        role: decodedPayload.role,
                         accessToken: accessToken,
                         accessTokenExpires: decodedPayload.exp
                     } as CustomUser
@@ -45,7 +45,7 @@ export const authOptions : AuthOptions = {
                 ...token,
                 username: customUser.username,
                 email: customUser.email,
-                roles: customUser.roles,
+                roles: customUser.role,
                 accessToken: customUser.accessToken,
                 accessTokenExpires: customUser.accessTokenExpires,
             };
@@ -57,7 +57,7 @@ export const authOptions : AuthOptions = {
             if (!session.user) session.user = {} as any;
             session.user.username = (token as any).username;
             session.user.email = (token as any).email;
-            session.user.roles = (token as any).roles;
+            session.user.role = (token as any).role;
 
             (session.user as any).accessToken = (token as any).accessToken;
             (session.user as any).accessTokenExpires = (token as any).accessTokenExpires;
@@ -82,7 +82,7 @@ interface CustomUser extends User{
     id: string;
     username: string;
     email: string;
-    roles: Role[];
+    role: Role;
     accessToken: string;
     accessTokenExpires: number;
 }

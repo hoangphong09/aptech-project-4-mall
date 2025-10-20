@@ -34,7 +34,7 @@ export default function RegisterPage() {
     setError("")
 
     try{
-        const response = await axiosAuth.post("api/auth/register", JSON.stringify({username: username, password: password, role: 'User', email: email}),
+        const response = await axiosAuth.post("api/auth/register", JSON.stringify({username: username, password: password, role: 'CUSTOMER', email: email}),
         {
           headers: {"Content-Type": "application/json"},
           withCredentials: true
@@ -58,6 +58,10 @@ export default function RegisterPage() {
           setIsLoading(false);
         }, 1000)
       }
+  }
+
+  function handleGoogleSignUp(): void {
+    throw new Error("Function not implemented.")
   }
 
   return (
@@ -220,7 +224,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="mt-6">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={() => handleGoogleSignUp()} className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"

@@ -60,6 +60,10 @@ export default function LoginPage() {
     
   }
 
+  const  handleGoogleSignIn = async (e: React.FormEvent) => {
+    const result = await signIn('google', {callbackUrl: "/"});
+  }
+
   const fillDemoCredentials = () => {
     setEmail(DEMO_EMAIL)
     setPassword(DEMO_PASSWORD)
@@ -220,7 +224,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-6">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={(e) => handleGoogleSignIn(e)} className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"

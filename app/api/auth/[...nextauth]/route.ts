@@ -22,6 +22,7 @@ export const authOptions : AuthOptions = {
                         id: String(decodedPayload.sub), 
                         username : decodedPayload.sub,
                         email: decodedPayload.email,
+                        fullname: decodedPayload.fullname,
                         role: decodedPayload.role,
                         accessToken: accessToken,
                         accessTokenExpires: decodedPayload.exp
@@ -33,23 +34,62 @@ export const authOptions : AuthOptions = {
         GoogleProvider({
             name: "Google",
             clientId: `${process.env.GOOGLE_CLIENT_ID}`,
-            clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`
+            clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
+            authorization: {
+                params: {
+                    scope: 'openid email profile', 
+                }
+            }
         })
     ],
 
     callbacks: {
         async jwt({token, user, account}){
-            if (user) {
-                const customUser = user as CustomUser
-            return {
-                ...token,
-                username: customUser.username,
-                email: customUser.email,
-                roles: customUser.role,
-                accessToken: customUser.accessToken,
-                accessTokenExpires: customUser.accessTokenExpires,
-            };
+            if(account?.provider === "credentials"){
+                if (user) {
+                    const customUser = user as CustomUser
+                    return {
+                        ...token,
+                        username: customUser.username,
+                        email: customUser.email,
+                        fullname: customUser.fullname,
+                        roles: customUser.role,
+                        accessToken: customUser.accessToken,
+                        accessTokenExpires: customUser.accessTokenExpires,
+                    };
+                }
             }
+            if(account?.provider === "google"){
+                const email = user.email;
+                const fullName = user.name;
+                const backendResponse = await fetch(`http://localhost:8080/api/auth/login?method=google`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: email, password: fullName }),
+                    credentials: 'include'
+                });
+
+                if (backendResponse.ok){
+                    const customUserData = await backendResponse.json();
+                    const accessToken = customUserData.token;
+                    const decodedPayload = jwtDecode<DecodedToken & { sub: string, exp: number }>(accessToken);
+
+                    return {
+                    ...token,
+                    id: String(decodedPayload.sub), 
+                    username: decodedPayload.sub, 
+                    email: decodedPayload.email,
+                    fullname: decodedPayload.fullname,
+                    role: decodedPayload.role,
+                    accessToken: accessToken,
+                    accessTokenExpires: decodedPayload.exp,
+                    };
+                }
+                
+            }
+
             return token;
         },
         async session({ session, token }) {
@@ -57,6 +97,7 @@ export const authOptions : AuthOptions = {
             if (!session.user) session.user = {} as any;
             session.user.username = (token as any).username;
             session.user.email = (token as any).email;
+            session.user.fullname = (token as any).fullname;
             session.user.role = (token as any).role;
 
             (session.user as any).accessToken = (token as any).accessToken;
@@ -81,6 +122,7 @@ export { handler as GET, handler as POST }
 interface CustomUser extends User{
     id: string;
     username: string;
+    fullname: string;
     email: string;
     role: Role;
     accessToken: string;

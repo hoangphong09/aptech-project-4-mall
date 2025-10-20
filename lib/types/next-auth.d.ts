@@ -6,6 +6,7 @@ export interface Role {
 
 export interface DecodedToken {
     email: string;
+    fullname: string;
     role: Role; 
 }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
         user: {
             id: string | undefined;
             username: string | undefined;
+            fullname: string;
             email: string;
             role: Role;
             accessToken: string;

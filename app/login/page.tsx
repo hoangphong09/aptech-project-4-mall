@@ -61,7 +61,9 @@ export default function LoginPage() {
   }
 
   const  handleGoogleSignIn = async (e: React.FormEvent) => {
-    const result = await signIn('google', {callbackUrl: "/"});
+    e.preventDefault();
+    setIsLoading(true);
+    const result = await signIn('google', { redirect: false, callbackUrl: "/" });
   }
 
   const fillDemoCredentials = () => {

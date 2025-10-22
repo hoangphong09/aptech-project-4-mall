@@ -1,6 +1,6 @@
 import { axiosAuth } from "../axios";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import useRefreshToken from './useRefreshToken';
 import { signIn, signOut } from "next-auth/react";
@@ -14,9 +14,35 @@ const useAxiosPrivate = () => {
 
     const { data: session } = useSession();
     const refresh = useRefreshToken(); 
+    const [hasRefreshed, setHasRefreshed] = useState(false);
+    const provider = session?.user.provider;
 
     useEffect(() => {
-       
+        
+        if (!hasRefreshed && provider === 'google') {
+            const refreshGoogle = async () =>{
+                const res = await axiosAuth.post(`/api/auth/refresh?method=${provider}`,
+            {},
+            {
+                withCredentials: true,
+                headers: {
+                    "Authorization": `Bearer ${session?.user.accessToken}`,
+                },
+            })
+                if (res.status === 200) setHasRefreshed(true)
+            }
+            refreshGoogle();
+        }
+
+    }, [hasRefreshed, provider])
+
+    useEffect(() => {
+    if (!session) {
+      setHasRefreshed(false);
+    }
+    }, [session]);
+
+    useEffect(() => {
         const interceptRequest = axiosAuth.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
                 if (!config.headers['Authorization']) {
@@ -59,7 +85,7 @@ const useAxiosPrivate = () => {
             axiosAuth.interceptors.request.eject(interceptRequest);
             axiosAuth.interceptors.response.eject(interceptResponse);
         }
-    }, [session, refresh]) 
+    }, [session?.user.accessToken, refresh]) 
 
     return axiosAuth; 
 }

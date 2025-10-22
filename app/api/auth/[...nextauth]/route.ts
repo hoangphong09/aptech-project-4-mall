@@ -25,7 +25,8 @@ export const authOptions : AuthOptions = {
                         fullname: decodedPayload.fullname,
                         role: decodedPayload.role,
                         accessToken: accessToken,
-                        accessTokenExpires: decodedPayload.exp
+                        accessTokenExpires: decodedPayload.exp,
+                        provider: 'credentials'
                     } as CustomUser
                 }
                 return null;
@@ -56,6 +57,7 @@ export const authOptions : AuthOptions = {
                         roles: customUser.role,
                         accessToken: customUser.accessToken,
                         accessTokenExpires: customUser.accessTokenExpires,
+                        provider: customUser.provider
                     };
                 }
             }
@@ -85,6 +87,7 @@ export const authOptions : AuthOptions = {
                     role: decodedPayload.role,
                     accessToken: accessToken,
                     accessTokenExpires: decodedPayload.exp,
+                    provider: 'google',
                     };
                 }
                 
@@ -102,6 +105,7 @@ export const authOptions : AuthOptions = {
 
             (session.user as any).accessToken = (token as any).accessToken;
             (session.user as any).accessTokenExpires = (token as any).accessTokenExpires;
+            (session.user as any).provider = (token as any).provider;
             return session;
         },
     },
@@ -127,4 +131,5 @@ interface CustomUser extends User{
     role: Role;
     accessToken: string;
     accessTokenExpires: number;
+    provider: string;
 }

@@ -20,6 +20,7 @@ declare module "next-auth" {
             email: string;
             role: Role;
             accessToken: string;
+            provider: string;
         }
     }
 }

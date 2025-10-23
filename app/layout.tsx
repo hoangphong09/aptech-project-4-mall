@@ -36,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="vi" className={`${inter.variable} ${robotoMono.variable} antialiased`}>
-      <body className={_v0_fontVariables}>
+    <html lang="vi" className={`${inter.variable} ${robotoMono.variable}`}>
+      <body className={`antialiased ${_v0_fontVariables}`}>
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>{children}</CartProvider>

@@ -5,6 +5,7 @@ import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
 import { CartProvider } from "@/contexts/cart-context"
 import { AuthProvider } from "@/contexts/auth-context"
+
 import { Inter, Roboto_Mono, Geist as V0_Font_Geist, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
 
 // Initialize fonts

@@ -19,7 +19,7 @@ const useAxiosPrivate = () => {
 
     useEffect(() => {
         
-        if (!hasRefreshed && provider === 'google') {
+        if (session && !hasRefreshed && provider === 'google') {
             const refreshGoogle = async () =>{
                 const res = await axiosAuth.post(`/api/auth/refresh?method=${provider}`,
             {},
@@ -29,18 +29,17 @@ const useAxiosPrivate = () => {
                     "Authorization": `Bearer ${session?.user.accessToken}`,
                 },
             })
-                if (res.status === 200) setHasRefreshed(true)
+                setHasRefreshed(true)
             }
             refreshGoogle();
         }
 
-    }, [hasRefreshed, provider])
+        if (!session) {
+            setHasRefreshed(false);
+        }
 
-    useEffect(() => {
-    if (!session) {
-      setHasRefreshed(false);
-    }
-    }, [session]);
+    }, [session])
+
 
     useEffect(() => {
         const interceptRequest = axiosAuth.interceptors.request.use(

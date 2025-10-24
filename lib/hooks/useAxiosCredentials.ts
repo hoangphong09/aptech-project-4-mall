@@ -22,7 +22,7 @@ const useAxiosPrivate = () => {
         
         if (session && !hasRefreshed && provider === 'google') {
             const refreshGoogle = async () =>{
-                const res = await axios.post(`/api/auth/refresh?method=${provider}`,
+                const res = await axiosAuth.post(`/api/auth/refresh?method=${provider}`,
             {},
             {
                 withCredentials: true,

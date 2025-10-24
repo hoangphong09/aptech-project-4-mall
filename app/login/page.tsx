@@ -11,7 +11,6 @@ import { axiosAuth } from "@/lib/axios"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

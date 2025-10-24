@@ -92,8 +92,19 @@ export default function ProfilePage(){
         }
     }
 
+    const changeCredentials = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+    }
+
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [emailVisible, setEmailVisible] = useState(false);
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordVisible1, setPasswordVisible1] = useState(false);
+
+    const [newEmail, setNewEmail] = useState(profile.email)
+    const [oldPass, setOldPass] = useState('')
+    const [newPass, setNewPass] = useState('')
+
     const router = useRouter()
 
     return (
@@ -164,37 +175,55 @@ export default function ProfilePage(){
       {/* Security Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Security</CardTitle>
+          <CardTitle>Update Credentials</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="new-email">Email</Label>
             <div className="relative">
               <Input
-                id="email"
+                id="new-email"
                 type="text"
-                value={profile.email}
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
               />
             </div>
 
-            <Label htmlFor="password">Email</Label>
+            <Label htmlFor="password">Old Password</Label>
             <div className="relative">
                 <Input
                 id="password"
-                type={emailVisible ? "text" : "password"}
-                value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                type={passwordVisible ? "text" : "password"}
+                value={oldPass}
+                onChange={(e) => setOldPass(e.target.value)}
                 />
                 <button
                 type="button"
-                onClick={() => setEmailVisible(!emailVisible)}
+                onClick={() => setPasswordVisible(!passwordVisible)}
                 className="absolute right-3 top-2 text-gray-500"
                 >
-                    {emailVisible ? <EyeOff /> : <Eye />}
+                    {passwordVisible ? <EyeOff /> : <Eye />}
+                </button>
+            </div>
+
+            <Label htmlFor="new-password">New Password</Label>
+            <div className="relative">
+                <Input
+                id="new-password"
+                type={passwordVisible1 ? "text" : "password"}
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+                />
+                <button
+                type="button"
+                onClick={() => setPasswordVisible1(!passwordVisible1)}
+                className="absolute right-3 top-2 text-gray-500"
+                >
+                    {passwordVisible1 ? <EyeOff /> : <Eye />}
                 </button>
             </div>
           </div>
-            <Button variant="secondary" onClick={() => router.push("/change-password")}>
+            <Button variant="secondary" onClick={(e) => changeCredentials(e)}>
                 Update Email/Password
             </Button>
         </CardContent>

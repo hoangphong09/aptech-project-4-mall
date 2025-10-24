@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import useRefreshToken from './useRefreshToken';
 import { signIn, signOut } from "next-auth/react";
+import axios from "axios";
 
 
 interface RetryAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -21,7 +22,7 @@ const useAxiosPrivate = () => {
         
         if (session && !hasRefreshed && provider === 'google') {
             const refreshGoogle = async () =>{
-                const res = await axiosAuth.post(`/api/auth/refresh?method=${provider}`,
+                const res = await axios.post(`/api/auth/refresh?method=${provider}`,
             {},
             {
                 withCredentials: true,

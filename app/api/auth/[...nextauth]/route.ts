@@ -69,7 +69,7 @@ export const authOptions : AuthOptions = {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username: email, password: fullName }),
+                    body: JSON.stringify({ username: email, fullname: fullName }),
                     credentials: 'include'
                 });
 

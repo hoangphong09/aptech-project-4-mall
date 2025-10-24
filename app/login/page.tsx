@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -12,6 +11,7 @@ import { axiosAuth } from "@/lib/axios"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,6 +20,8 @@ export default function LoginPage() {
 
   const DEMO_EMAIL = "demo.account@gmail.com"
   const DEMO_PASSWORD = "demo@123"
+  const ADMIN_EMAIL = "admin@pandamall.com"
+  const ADMIN_PASSWORD = "admin123"
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,6 +71,12 @@ export default function LoginPage() {
   const fillDemoCredentials = () => {
     setEmail(DEMO_EMAIL)
     setPassword(DEMO_PASSWORD)
+    setError("")
+  }
+
+  const fillAdminCredentials = () => {
+    setEmail(ADMIN_EMAIL)
+    setPassword(ADMIN_PASSWORD)
     setError("")
   }
 
@@ -127,23 +135,45 @@ export default function LoginPage() {
             <p className="text-gray-600">Đăng nhập để tiếp tục mua sắm</p>
           </div>
 
-          <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-orange-800 mb-1">Tài khoản demo</p>
-                <p className="text-xs text-orange-700 mb-2">
-                  Email: <span className="font-mono font-semibold">{DEMO_EMAIL}</span>
-                  <br />
-                  Mật khẩu: <span className="font-mono font-semibold">{DEMO_PASSWORD}</span>
-                </p>
+          <div className="mb-6 space-y-3">
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-orange-800 mb-1">Tài khoản demo</p>
+                  <p className="text-xs text-orange-700 mb-2">
+                    Email: <span className="font-mono font-semibold">{DEMO_EMAIL}</span>
+                    <br />
+                    Mật khẩu: <span className="font-mono font-semibold">{DEMO_PASSWORD}</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillDemoCredentials}
+                  className="text-xs font-medium text-[#ff6600] hover:text-[#ff5500] underline whitespace-nowrap"
+                >
+                  Điền tự động
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={fillDemoCredentials}
-                className="text-xs font-medium text-[#ff6600] hover:text-[#ff5500] underline whitespace-nowrap"
-              >
-                Điền tự động
-              </button>
+            </div>
+
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-blue-800 mb-1">Tài khoản Admin</p>
+                  <p className="text-xs text-blue-700 mb-2">
+                    Email: <span className="font-mono font-semibold">{ADMIN_EMAIL}</span>
+                    <br />
+                    Mật khẩu: <span className="font-mono font-semibold">{ADMIN_PASSWORD}</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillAdminCredentials}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-700 underline whitespace-nowrap"
+                >
+                  Điền tự động
+                </button>
+              </div>
             </div>
           </div>
 

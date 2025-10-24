@@ -2,24 +2,7 @@
 
 import { useLanguage } from "@/contexts/language-context"
 import { useEffect, useState } from "react"
-
-interface Category {
-  id: string
-  name: string
-  icon?: string
-}
-
-const categoryTranslations: Record<string, { vi: string; en: string; zh: string }> = {
-  服装服饰: { vi: "Thời trang", en: "Fashion", zh: "服装服饰" },
-  母婴用品: { vi: "Mẹ và bé", en: "Mother & Baby", zh: "母婴用品" },
-  电子配件: { vi: "Phụ kiện điện tử", en: "Electronics", zh: "电子配件" },
-  办公文具: { vi: "Văn phòng phẩm", en: "Office Supplies", zh: "办公文具" },
-  美容护理: { vi: "Sức khỏe & Sắc đẹp", en: "Health & Beauty", zh: "美容护理" },
-  家用电器: { vi: "Điện gia dụng", en: "Home Appliances", zh: "家用电器" },
-  汽车配件: { vi: "Phụ kiện & trang trí", en: "Accessories & Decor", zh: "汽车配件" },
-  运动户外: { vi: "Thể thao & dã ngoại", en: "Sports & Outdoor", zh: "运动户外" },
-  箱包皮具: { vi: "Túi xách, vali", en: "Bags & Luggage", zh: "箱包皮具" },
-}
+import { getCategories, type Category } from "@/lib/data-storage"
 
 export default function HeroSection() {
   const { t, language } = useLanguage()
@@ -27,36 +10,17 @@ export default function HeroSection() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchCategories() {
-      try {
-        console.log("[v0] Fetching categories from API")
-        const response = await fetch("/api/categories")
-
-        if (!response.ok) {
-          console.error("[v0] Failed to fetch categories:", response.status)
-          setLoading(false)
-          return
-        }
-
-        const data = await response.json()
-        console.log("[v0] Categories loaded:", data.categories?.length || 0)
-        setCategories(data.categories || [])
-      } catch (error) {
-        console.error("[v0] Error fetching categories:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchCategories()
+    console.log("[v0] Loading categories from storage")
+    const loadedCategories = getCategories()
+    console.log("[v0] Categories loaded:", loadedCategories.length)
+    setCategories(loadedCategories)
+    setLoading(false)
   }, [])
 
-  const translateCategoryName = (name: string): string => {
-    const translation = categoryTranslations[name]
-    if (translation) {
-      return translation[language]
-    }
-    return name
+  const translateCategoryName = (category: Category): string => {
+    if (language === "vi") return category.name
+    if (language === "en") return category.nameEn
+    return category.nameZh
   }
 
   return (
@@ -84,7 +48,7 @@ export default function HeroSection() {
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#f5ede0] transition-colors text-[#6b5744]"
                     >
                       <span className="text-lg">{category.icon || "📦"}</span>
-                      <span className="text-sm">{translateCategoryName(category.name)}</span>
+                      <span className="text-sm">{translateCategoryName(category)}</span>
                     </a>
                   ))
                 ) : (

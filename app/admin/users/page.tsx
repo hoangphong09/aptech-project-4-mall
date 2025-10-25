@@ -96,7 +96,7 @@ export default function UsersPage() {
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
       setUsers(users.filter((user) => user.id !== id))
-      deleteUser(id) // Delete from auth context
+      deleteUser(id)
     }
   }
 

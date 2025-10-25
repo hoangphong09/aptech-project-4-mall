@@ -1,6 +1,6 @@
 import NextAuth, { AuthOptions, Awaitable, RequestInternal, User } from "next-auth"
 import { jwtDecode } from "jwt-decode"
-import { DecodedToken, Role, Status } from "@/lib/types/next-auth"
+import { DecodedToken } from "@/lib/types/next-auth"
 
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
@@ -26,7 +26,7 @@ export const authOptions : AuthOptions = {
                         role: decodedPayload.role,
                         status: decodedPayload.status,
                         accessToken: accessToken,
-                        accessTokenExpires: decodedPayload.exp,
+                        accessTokenExpires: decodedPayload.exp * 1000,
                         provider: 'credentials'
                     } as CustomUser
                 }
@@ -55,8 +55,8 @@ export const authOptions : AuthOptions = {
                         username: customUser.username,
                         email: customUser.email,
                         fullname: customUser.fullname,
-                        roles: customUser.role,
-                        status: customUser.status,
+                        role: customUser.role as string,
+                        status: customUser.status as string,
                         accessToken: customUser.accessToken,
                         accessTokenExpires: customUser.accessTokenExpires,
                         provider: customUser.provider
@@ -89,7 +89,7 @@ export const authOptions : AuthOptions = {
                     role: decodedPayload.role,
                     status: decodedPayload.status,
                     accessToken: accessToken,
-                    accessTokenExpires: decodedPayload.exp,
+                    accessTokenExpires: decodedPayload.exp * 1000,
                     provider: 'google',
                     };
                 }
@@ -132,8 +132,8 @@ interface CustomUser extends User{
     username: string;
     fullname: string;
     email: string;
-    role: Role;
-    status: Status;
+    role: string;
+    status: string;
     accessToken: string;
     accessTokenExpires: number;
     provider: string;

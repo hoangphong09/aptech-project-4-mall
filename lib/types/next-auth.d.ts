@@ -1,18 +1,10 @@
 import NextAuth from "next-auth";
 
-export interface Role {
-    name: string;
-}
-
-export interface Status {
-    name: string;
-}
-
 export interface DecodedToken {
     email: string;
     fullname: string;
-    role: Role; 
-    status: Status;
+    role: string; 
+    status: string;
 }
 
 declare module "next-auth" {
@@ -23,10 +15,10 @@ declare module "next-auth" {
             username: string | undefined;
             fullname: string;
             email: string;
-            role: Role;
+            role: string;
             accessToken: string;
             provider: string;
-            status: Status;
+            status: string;
         }
     }
 }

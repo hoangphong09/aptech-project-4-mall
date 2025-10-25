@@ -2,7 +2,6 @@
 
 import { createContext, useContext, ReactNode, useMemo } from "react"
 import { useSession } from "next-auth/react"
-import { Role, Status } from "@/lib/types/next-auth"
 import { axiosAuth } from "@/lib/axios"
 
 interface AuthContextType {
@@ -19,8 +18,8 @@ export interface SessionUser {
   username?: string;
   fullname: string;
   email: string;
-  role: Role;
-  status: Status;
+  role: string;
+  status: string;
   accessToken: string;
   accessTokenExpires?: string;
   provider?: string;
@@ -56,8 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     : null
 
-  const isAdmin = user?.role.name === "ADMIN"
-  const isStaff = user?.role.name === "STAFF"
+    console.log("Role: "+ session?.user.role);
+  const isAdmin = user?.role === "ADMIN"
+  const isStaff = user?.role === "STAFF"
 
   const getAllUsers = async (): Promise<User[]> => {
     if (!user?.accessToken) throw new Error("No access token available")

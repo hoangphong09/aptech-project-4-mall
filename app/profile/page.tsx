@@ -153,7 +153,7 @@ export default function ProfilePage(){
 
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" value={profile.email}/>
+              <Input id="email" value={profile.email} readOnly/>
             </div>
 
             <div>
@@ -179,12 +179,13 @@ export default function ProfilePage(){
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="new-email">Email</Label>
+            <Label htmlFor="new-email">Change Email</Label>
             <div className="relative">
               <Input
                 id="new-email"
                 type="text"
                 value={newEmail}
+                placeholder={profile.email}
                 onChange={(e) => setNewEmail(e.target.value)}
               />
             </div>

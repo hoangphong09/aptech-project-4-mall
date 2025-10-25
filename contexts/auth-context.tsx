@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     : null
 
-    console.log("Role: "+ session?.user.role);
   const isAdmin = user?.role === "ADMIN"
   const isStaff = user?.role === "STAFF"
 

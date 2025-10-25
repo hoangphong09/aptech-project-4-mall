@@ -35,7 +35,6 @@ export default function LoginPage() {
       })
                     
       const accessToken = res.data.token;
-      console.log(accessToken);
       
       if (res && accessToken){
         const result = await signIn('credentials', {

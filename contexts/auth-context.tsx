@@ -3,7 +3,7 @@
 import { createContext, useContext, ReactNode, useMemo } from "react"
 import { useSession } from "next-auth/react"
 import { Role, Status } from "@/lib/types/next-auth"
-import useAxiosPrivate from "@/lib/hooks/useAxiosCredentials"
+import { axiosAuth } from "@/lib/axios"
 
 interface AuthContextType {
   user: SessionUser | null
@@ -40,8 +40,7 @@ interface User {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, status } = useSession()
-  const axiosPrivate = useAxiosPrivate();
+  const { data: session, status } = useSession();
 
   const user = session?.user
     ? {
@@ -63,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const getAllUsers = async (): Promise<User[]> => {
     if (!user?.accessToken) throw new Error("No access token available")
 
-    const res = await axiosPrivate.get("/api/users/", {
+    const res = await axiosAuth.get("/api/users/", {
       headers: {
         Authorization: `Bearer ${user.accessToken}`,
       },
@@ -74,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUser = async (id: string, updates: Partial<User>): Promise<void> => {
   if (!user?.accessToken) throw new Error("No access token available")
 
-  await axiosPrivate.patch(`/api/users/${id}`, updates, {
+  await axiosAuth.patch(`/api/users/${id}`, updates, {
     headers: {
       Authorization: `Bearer ${user.accessToken}`,
     },
@@ -84,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const deleteUser = async (id: string): Promise<void> => {
   if (!user?.accessToken) throw new Error("No access token available")
 
-  await axiosPrivate.delete(`/api/users/${id}`, {
+  await axiosAuth.delete(`/api/users/${id}`, {
     headers: {
       Authorization: `Bearer ${user.accessToken}`,
     },

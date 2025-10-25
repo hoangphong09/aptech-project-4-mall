@@ -6,6 +6,7 @@ import { CartProvider } from "@/contexts/cart-context"
 import { Geist as V0_Font_Geist, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
 import { SessionContext } from "@/contexts/session-context"
 import { ReactNode } from "react"
+import { AuthProvider } from "@/contexts/auth-context"
 
 // Initialize fonts
 const _geist = V0_Font_Geist({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700","800","900"], variable: '--v0-font-geist' })
@@ -27,7 +28,9 @@ export default function RootLayout({
       <body className={`antialiased ${_v0_fontVariables}`}>
         <SessionContext session={session}>
         <LanguageProvider>
+          <AuthProvider>
             <CartProvider>{children}</CartProvider>
+          </AuthProvider>
         </LanguageProvider>
         </SessionContext>
       </body>

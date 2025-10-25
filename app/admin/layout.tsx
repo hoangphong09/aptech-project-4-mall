@@ -11,7 +11,7 @@ import { useState } from "react"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const navigation = [
@@ -76,20 +76,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-4 border-t border-gray-200">
               <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-[#ff6600] flex items-center justify-center text-white font-semibold">
-                  {user?.name.charAt(0)}
+                  {user?.fullname.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{user?.fullname}</p>
                   <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                 </div>
               </div>
-              <button
-                onClick={logout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <LogOut className="h-5 w-5" />
-                <span className="font-medium">Logout</span>
-              </button>
             </div>
           </div>
         </aside>

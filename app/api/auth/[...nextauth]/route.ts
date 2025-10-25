@@ -1,6 +1,6 @@
 import NextAuth, { AuthOptions, Awaitable, RequestInternal, User } from "next-auth"
 import { jwtDecode } from "jwt-decode"
-import { DecodedToken, Role } from "@/lib/types/next-auth"
+import { DecodedToken, Role, Status } from "@/lib/types/next-auth"
 
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
@@ -24,6 +24,7 @@ export const authOptions : AuthOptions = {
                         email: decodedPayload.email,
                         fullname: decodedPayload.fullname,
                         role: decodedPayload.role,
+                        status: decodedPayload.status,
                         accessToken: accessToken,
                         accessTokenExpires: decodedPayload.exp,
                         provider: 'credentials'
@@ -55,6 +56,7 @@ export const authOptions : AuthOptions = {
                         email: customUser.email,
                         fullname: customUser.fullname,
                         roles: customUser.role,
+                        status: customUser.status,
                         accessToken: customUser.accessToken,
                         accessTokenExpires: customUser.accessTokenExpires,
                         provider: customUser.provider
@@ -85,6 +87,7 @@ export const authOptions : AuthOptions = {
                     email: decodedPayload.email,
                     fullname: decodedPayload.fullname,
                     role: decodedPayload.role,
+                    status: decodedPayload.status,
                     accessToken: accessToken,
                     accessTokenExpires: decodedPayload.exp,
                     provider: 'google',
@@ -102,6 +105,7 @@ export const authOptions : AuthOptions = {
             session.user.email = (token as any).email;
             session.user.fullname = (token as any).fullname;
             session.user.role = (token as any).role;
+            session.user.status = (token as any).status;
 
             (session.user as any).accessToken = (token as any).accessToken;
             (session.user as any).accessTokenExpires = (token as any).accessTokenExpires;
@@ -129,6 +133,7 @@ interface CustomUser extends User{
     fullname: string;
     email: string;
     role: Role;
+    status: Status;
     accessToken: string;
     accessTokenExpires: number;
     provider: string;

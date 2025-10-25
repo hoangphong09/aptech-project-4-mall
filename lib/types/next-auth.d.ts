@@ -4,10 +4,15 @@ export interface Role {
     name: string;
 }
 
+export interface Status {
+    name: string;
+}
+
 export interface DecodedToken {
     email: string;
     fullname: string;
     role: Role; 
+    status: Status;
 }
 
 declare module "next-auth" {
@@ -21,6 +26,7 @@ declare module "next-auth" {
             role: Role;
             accessToken: string;
             provider: string;
+            status: Status;
         }
     }
 }

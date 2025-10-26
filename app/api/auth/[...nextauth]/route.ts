@@ -17,13 +17,15 @@ export const authOptions : AuthOptions = {
                 if (credentials?.accessToken){
                     const accessToken = credentials.accessToken;
                     const decodedPayload = jwtDecode<DecodedToken & { sub: string, exp: number }>(accessToken);
+                    const rawRole = decodedPayload.role;
+                    const role = rawRole?.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
 
                     return {
                         id: String(decodedPayload.sub), 
                         username : decodedPayload.sub,
                         email: decodedPayload.email,
                         fullname: decodedPayload.fullname,
-                        role: decodedPayload.role,
+                        role: role,
                         status: decodedPayload.status,
                         accessToken: accessToken,
                         accessTokenExpires: decodedPayload.exp * 1000,
@@ -50,13 +52,16 @@ export const authOptions : AuthOptions = {
             if(account?.provider === "credentials"){
                 if (user) {
                     const customUser = user as CustomUser
+                    const rawRole = customUser.role;
+                    const role = rawRole?.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
+
                     return {
                         ...token,
                         username: customUser.username,
                         email: customUser.email,
                         fullname: customUser.fullname,
-                        role: customUser.role as string,
-                        status: customUser.status as string,
+                        role: role,
+                        status: customUser.status,
                         accessToken: customUser.accessToken,
                         accessTokenExpires: customUser.accessTokenExpires,
                         provider: customUser.provider
@@ -79,14 +84,16 @@ export const authOptions : AuthOptions = {
                     const customUserData = await backendResponse.json();
                     const accessToken = customUserData.token;
                     const decodedPayload = jwtDecode<DecodedToken & { sub: string, exp: number }>(accessToken);
-
+                    const rawRole = decodedPayload.role;
+                    const role = rawRole?.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
+                    
                     return {
                     ...token,
                     id: String(decodedPayload.sub), 
                     username: decodedPayload.sub, 
                     email: decodedPayload.email,
                     fullname: decodedPayload.fullname,
-                    role: decodedPayload.role,
+                    role: role,
                     status: decodedPayload.status,
                     accessToken: accessToken,
                     accessTokenExpires: decodedPayload.exp * 1000,
@@ -101,10 +108,13 @@ export const authOptions : AuthOptions = {
         async session({ session, token }) {
 
             if (!session.user) session.user = {} as any;
+            const rawRole = (token as any).role;
+            const role = rawRole?.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
+
             session.user.username = (token as any).username;
             session.user.email = (token as any).email;
             session.user.fullname = (token as any).fullname;
-            session.user.role = (token as any).role;
+            session.user.role = role;
             session.user.status = (token as any).status;
 
             (session.user as any).accessToken = (token as any).accessToken;

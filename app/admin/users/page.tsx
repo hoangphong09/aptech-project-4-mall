@@ -52,7 +52,7 @@ export default function UsersPage() {
     try {
       const authUsers = await getAllUsers()
       setUsers(authUsers.map((u: any) => ({
-        id: u.id.toString(),
+        id: u.userId,
         username: u.username ?? "",
         fullName: u.fullName ?? "",
         email: u.email ?? "",
@@ -62,7 +62,7 @@ export default function UsersPage() {
         status: (u.status ?? "ACTIVE") as "ACTIVE" | "SUSPENDED" | "DELETED",
         orders: 0,
         totalSpent: 0,
-        createdAt: u.createdAt ?? new Date().toISOString().split("T")[0],
+        createdAt: u.createdAt,
       })))
     } catch (err) {
       console.error("Failed to fetch users:", err)
@@ -286,7 +286,7 @@ export default function UsersPage() {
                 <Input
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="Hoàng Phong"
+                  placeholder="Tên đầy đủ"
                   required
                 />
               </div>
@@ -306,7 +306,6 @@ export default function UsersPage() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="+84 123 456 789"
-                  required
                 />
               </div>
               <div>

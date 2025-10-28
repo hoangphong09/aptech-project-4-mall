@@ -60,8 +60,8 @@ export default function UsersPage() {
         avatarUrl: u.avatarUrl ?? "",
         role: (u.role ?? "CUSTOMER") as "ADMIN" | "STAFF" | "CUSTOMER",
         status: (u.status ?? "ACTIVE") as "ACTIVE" | "SUSPENDED" | "DELETED",
-        orders: 0,
-        totalSpent: 0,
+        orders: u.orderCount,
+        totalSpent: u.totalSpent,
         createdAt: u.createdAt,
       })))
     } catch (err) {
@@ -95,20 +95,27 @@ export default function UsersPage() {
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      setUsers(users.filter((user) => user.id !== id))
       deleteUser(id)
     }
   }
 
   const handleToggleStatus = (id: string) => {
-  setUsers(users.map((user) =>
-    user.id === id
+    const user = users.find(user => user.id === id);
+    if (user){
+      setUsers(users.map((user) =>
+      user.id === id
       ? {
           ...user,
           status: user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE",
         }
       : user
-    ));
+      ));
+
+      updateUser(user.id, {
+            status: user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE",
+          })
+    }
+    
   };
 
   const handleSubmit = (e: React.FormEvent) => {

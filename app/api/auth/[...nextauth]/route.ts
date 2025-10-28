@@ -21,7 +21,7 @@ export const authOptions : AuthOptions = {
                     const role = rawRole?.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
 
                     return {
-                        id: String(decodedPayload.sub), 
+                        id: String(decodedPayload.id), 
                         username : decodedPayload.sub,
                         email: decodedPayload.email,
                         fullname: decodedPayload.fullname,
@@ -89,7 +89,7 @@ export const authOptions : AuthOptions = {
                     
                     return {
                     ...token,
-                    id: String(decodedPayload.sub), 
+                    id: String(decodedPayload.id), 
                     username: decodedPayload.sub, 
                     email: decodedPayload.email,
                     fullname: decodedPayload.fullname,

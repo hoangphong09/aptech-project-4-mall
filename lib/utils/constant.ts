@@ -1,19 +1,3 @@
-import axios, { AxiosInstance } from "axios";
-
-const REST_API_BASE_URL: string = "http://localhost:8080";
-
-const axiosInstance: AxiosInstance = axios.create({
-    baseURL: REST_API_BASE_URL
-});
-
-export default axiosInstance;
-
-export const axiosAuth: AxiosInstance = axios.create({
-    baseURL: REST_API_BASE_URL,
-    headers: { 'Content-Type' : 'application/json' },
-    withCredentials: true
-});
-
 // App info
 export const APP_NAME = 'PandaMall';
 export const API_TIMEOUT = 10000;
@@ -88,14 +72,3 @@ export const SORT_LABELS: Record<SortOptionKey, string> = {
   'price-desc': 'Price: High to Low',
   sales: 'Best Selling',
 };
-
-const API_BASE_URL = 'http://localhost:8080/api';
-
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 100000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-

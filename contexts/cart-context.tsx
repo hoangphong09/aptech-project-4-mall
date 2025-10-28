@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useSession } from "next-auth/react"
-import { cartApi, type AddToCartPayload } from "@/lib/apis/cartApi";
+import { cartApi, type AddToCartPayload } from "@/lib/service/cartApi";
 
 export interface CartItem {
   id: string

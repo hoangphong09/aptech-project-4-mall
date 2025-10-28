@@ -10,3 +10,4 @@ NEXTAUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID (Get from Google API)
 GOOGLE_CLIENT_SECRET (Get from Google API)
 
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8080

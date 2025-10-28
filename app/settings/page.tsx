@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@radix-ui/react-label"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
+import Header from "@/components/header"
 
 export default function ProfilePage(){
     const {data:session, status} = useSession()
@@ -108,10 +109,13 @@ export default function ProfilePage(){
     const router = useRouter()
 
     return (
+      <div>
+        <Header/>
     <div className="max-w-5xl mx-auto p-6 space-y-8">
+      
       <div className="flex items-center gap-3 mb-6">
         <ShoppingBag className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-semibold">My Profile</h1>
+        <h1 className="text-2xl font-semibold">Settings</h1>
       </div>
 
       {/* Profile Card */}
@@ -123,7 +127,7 @@ export default function ProfilePage(){
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Image
-                src={profile.avatarUrl || "/default-avatar.png"}
+                src={process.env.NEXT_PUBLIC_BACKEND_URL + profile.avatarUrl || "/default-avatar.png"}
                 alt="User Avatar"
                 width={128}
                 height={128}
@@ -142,6 +146,15 @@ export default function ProfilePage(){
           </div>
 
           <div className="space-y-4">
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={profile.username}
+                onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+              />
+            </div>
+
             <div>
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -229,6 +242,7 @@ export default function ProfilePage(){
             </Button>
         </CardContent>
       </Card>
+    </div>
     </div>
     )
 }

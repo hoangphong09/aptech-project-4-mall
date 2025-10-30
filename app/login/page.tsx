@@ -1,15 +1,16 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, ShoppingBag } from "lucide-react"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { axiosAuth } from "@/lib/axios"
 
 export default function LoginPage() {
+  const {data:session,status} = useSession();
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
@@ -21,6 +22,18 @@ export default function LoginPage() {
   const DEMO_PASSWORD = "demo@123"
   const ADMIN_EMAIL = "admin@pandamall.com"
   const ADMIN_PASSWORD = "admin123"
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role){
+      switch (session?.user?.role){
+        case "ADMIN": {
+          router.push("/admin")
+          return;
+        }
+        default: router.push("/")
+      }
+    }
+  }, [status, session])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,11 +55,11 @@ export default function LoginPage() {
         redirect: false
         })
 
+        
         setTimeout(() => {
-        // (email === DEMO_EMAIL && password === DEMO_PASSWORD)
+          
         if (result?.ok) {
           setIsLoading(false)
-          router.push("/")
         } else {
           setIsLoading(false)
           if (result?.error) setError(result.error);

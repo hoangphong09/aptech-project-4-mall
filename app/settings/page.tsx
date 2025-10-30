@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, ShoppingBag, Upload } from "lucide-react"
 import { axiosAuth } from "@/lib/axios"
-import { AxiosError } from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@radix-ui/react-label"
 import Image from "next/image"
@@ -75,7 +74,7 @@ export default function ProfilePage(){
             formData.append("username", profile.username);
             formData.append("fullName", profile.fullName);
             formData.append("phone", profile.phone);
-            formData.append("avatarUrl", profile.avatarUrl);
+            if (profile.avatarUrl) formData.append("avatarUrl", profile.avatarUrl);
 
             if (avatarFile) formData.append("avatar", avatarFile);
 
@@ -127,7 +126,7 @@ export default function ProfilePage(){
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Image
-                src={process.env.NEXT_PUBLIC_BACKEND_URL + profile.avatarUrl || "/default-avatar.png"}
+                src={profile.avatarUrl !== "" && profile.avatarUrl !== undefined ? process.env.NEXT_PUBLIC_BACKEND_URL + profile.avatarUrl : "/default-avatar.png"}
                 alt="User Avatar"
                 width={128}
                 height={128}

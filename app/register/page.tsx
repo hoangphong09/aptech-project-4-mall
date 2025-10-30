@@ -34,7 +34,7 @@ export default function RegisterPage() {
     setError("")
 
     try{
-        const response = await axiosAuth.post("api/auth/register", JSON.stringify({username: username, password: password, role: 'CUSTOMER', email: email}),
+        const response = await axiosAuth.post("api/auth/register", JSON.stringify({username: username, password: password, email: email}),
         {
           headers: {"Content-Type": "application/json"},
           withCredentials: true

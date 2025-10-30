@@ -69,6 +69,7 @@ export const authOptions : AuthOptions = {
                 }
             }
             if(account?.provider === "google"){
+                const sub = account.providerAccountId;
                 const email = user.email;
                 const fullName = user.name;
                 const backendResponse = await fetch(`http://localhost:8080/api/auth/login?method=google`, {
@@ -76,7 +77,7 @@ export const authOptions : AuthOptions = {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username: email, fullname: fullName }),
+                    body: JSON.stringify({ email: email, fullname: fullName, googleSub: sub }),
                     credentials: 'include'
                 });
 

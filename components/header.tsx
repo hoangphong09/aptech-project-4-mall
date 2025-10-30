@@ -203,9 +203,9 @@ export default function Header() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                 >
                   <div className="w-9 h-9 rounded-full bg-gray-400 flex items-center justify-center text-white font-semibold">
-                    {session.data?.user.fullname.charAt(0)}
+                    {session.data?.user?.fullname?.charAt(0)}
                   </div>
-                  <span className="text-sm text-gray-700 hidden lg:inline">{session.data?.user.username}</span>
+                  <span className="text-sm text-gray-700 hidden lg:inline">{session.data?.user?.username}</span>
                   <ChevronDown className="h-4 w-4 text-gray-600 hidden lg:inline" />
                 </div>
 

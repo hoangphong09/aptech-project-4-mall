@@ -1,0 +1,13 @@
+npx auth secret
+
+node -v
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+==== Env variables, (put these in .env.local) ===
+NEXTAUTH_SECRET=(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
+NEXTAUTH_URL=http://localhost:3000
+
+GOOGLE_CLIENT_ID (Get from Google API)
+GOOGLE_CLIENT_SECRET (Get from Google API)
+
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8080

@@ -10,143 +10,144 @@ import { Plus, Pencil, Trash2, Search, Ban, CheckCircle, Eye, EyeOff } from "luc
 import { useAuth } from "@/contexts/auth-context"
 
 interface User {
+  avatarUrl: string
   id: string
-  name: string
+  username?: string
+  fullName: string
   email: string
   phone: string
-  role: "admin" | "user"
-  status: "active" | "banned"
+  role: "ADMIN" | "STAFF" | "CUSTOMER"
+  status: "ACTIVE" | "SUSPENDED" | "DELETED"
   orders: number
   totalSpent: number
   createdAt: string
-  password?: string // Added password field
+}
+
+interface UserUpdateDTO {
+  fullName?: string
+  avatarUrl?: string
+  phone?: string
+  email?: string
+  role?: "ADMIN" | "STAFF" | "CUSTOMER"
+  status?: "ACTIVE" | "SUSPENDED" | "DELETED"
 }
 
 export default function UsersPage() {
-  const { getAllUsers, createUser, updateUser, deleteUser } = useAuth()
+  const { getAllUsers, updateUser, deleteUser } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [showPassword, setShowPassword] = useState(false) // Added password visibility toggle
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role: "user" as "admin" | "user",
-    password: "", // Added password field
-  })
+  const [formData, setFormData] = useState<UserUpdateDTO>({
+  fullName: "",
+  avatarUrl: "",
+  phone: "",
+  email: "",
+  role: "CUSTOMER",
+  status: "ACTIVE",
+  });
 
   useEffect(() => {
-    const authUsers = getAllUsers()
-    const usersWithDetails: User[] = authUsers.map((u) => ({
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      phone: "+84 123 456 789", // Default phone
-      role: u.role,
-      status: "active" as const,
-      orders: 0,
-      totalSpent: 0,
-      createdAt: new Date().toISOString().split("T")[0],
-      password: u.password,
-    }))
-    setUsers(usersWithDetails)
+  const fetchUsers = async () => {
+    try {
+      const authUsers = await getAllUsers()
+      setUsers(authUsers.map((u: any) => ({
+        id: u.userId,
+        username: u.username ?? "",
+        fullName: u.fullName ?? "",
+        email: u.email ?? "",
+        phone: u.phone ?? "",
+        avatarUrl: u.avatarUrl ?? "",
+        role: (u.role ?? "CUSTOMER") as "ADMIN" | "STAFF" | "CUSTOMER",
+        status: (u.status ?? "ACTIVE") as "ACTIVE" | "SUSPENDED" | "DELETED",
+        orders: u.orderCount,
+        totalSpent: u.totalSpent,
+        createdAt: u.createdAt,
+      })))
+    } catch (err) {
+      console.error("Failed to fetch users:", err)
+    }
+  }
+
+  fetchUsers()
   }, [])
+
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.phone.includes(searchQuery),
   )
 
-  const handleAdd = () => {
-    setEditingUser(null)
-    setFormData({ name: "", email: "", phone: "", role: "user", password: "" }) // Reset password field
-    setShowPassword(false)
-    setIsModalOpen(true)
-  }
-
   const handleEdit = (user: User) => {
     setEditingUser(user)
     setFormData({
-      name: user.name,
+      fullName: user.fullName,
       email: user.email,
       phone: user.phone,
-      role: user.role,
-      password: user.password || "", // Load existing password
+      avatarUrl: user.avatarUrl || "",
+      role: user.role?.toUpperCase() as "ADMIN" | "STAFF" | "CUSTOMER",
+      status: user.status?.toUpperCase() as "ACTIVE" | "SUSPENDED" | "DELETED",
     })
-    setShowPassword(false)
     setIsModalOpen(true)
   }
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      setUsers(users.filter((user) => user.id !== id))
-      deleteUser(id) // Delete from auth context
+      deleteUser(id)
     }
   }
 
   const handleToggleStatus = (id: string) => {
-    setUsers(
-      users.map((user) =>
-        user.id === id
-          ? { ...user, status: user.status === "active" ? ("banned" as const) : ("active" as const) }
-          : user,
-      ),
-    )
-  }
+    const user = users.find(user => user.id === id);
+    if (user){
+      setUsers(users.map((user) =>
+      user.id === id
+      ? {
+          ...user,
+          status: user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE",
+        }
+      : user
+      ));
+
+      updateUser(user.id, {
+            status: user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE",
+          })
+    }
+    
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!editingUser && formData.password.length < 6) {
-      alert("Password must be at least 6 characters long")
-      return
-    }
-
     if (editingUser) {
-      const updatedUser = {
-        ...editingUser,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        role: formData.role,
-        ...(formData.password && { password: formData.password }), // Only update password if provided
-      }
-      setUsers(users.map((user) => (user.id === editingUser.id ? updatedUser : user)))
-      updateUser(editingUser.id, {
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-        ...(formData.password && { password: formData.password }),
-      })
-    } else {
-      const newUser: User = {
-        id: Date.now().toString(),
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        role: formData.role,
-        status: "active",
-        orders: 0,
-        totalSpent: 0,
-        createdAt: new Date().toISOString().split("T")[0],
-        password: formData.password,
-      }
-      setUsers([...users, newUser])
-      createUser({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        password: newUser.password,
-      })
-    }
+
+    const updatedUser: User = {
+      ...editingUser,
+      fullName: formData.fullName ?? editingUser.fullName,
+      email: formData.email ?? editingUser.email,
+      phone: formData.phone ?? editingUser.phone,
+      role: formData.role ?? editingUser.role,
+      status: formData.status ?? editingUser.status,
+      avatarUrl: formData.avatarUrl ?? editingUser.avatarUrl,
+    };
+
+    setUsers(users.map((user) => (user.id === editingUser.id ? updatedUser : user)));
+
+    updateUser(editingUser.id, {
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      role: formData.role,
+      status: formData.status,
+      avatarUrl: formData.avatarUrl,
+    });
+  }
+
 
     setIsModalOpen(false)
-  }
+    }
 
   return (
     <div className="space-y-6">
@@ -156,10 +157,6 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">Users</h1>
           <p className="text-gray-600 mt-1">Manage user accounts and permissions</p>
         </div>
-        <Button onClick={handleAdd} className="bg-[#ff6600] hover:bg-[#ff5500]">
-          <Plus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
       </div>
 
       {/* Stats */}
@@ -170,11 +167,11 @@ export default function UsersPage() {
         </Card>
         <Card className="p-6">
           <p className="text-sm font-medium text-gray-600">Active Users</p>
-          <p className="text-3xl font-bold text-green-600 mt-2">{users.filter((u) => u.status === "active").length}</p>
+          <p className="text-3xl font-bold text-green-600 mt-2">{users.filter((u) => u.status === "ACTIVE").length}</p>
         </Card>
         <Card className="p-6">
           <p className="text-sm font-medium text-gray-600">Banned Users</p>
-          <p className="text-3xl font-bold text-red-600 mt-2">{users.filter((u) => u.status === "banned").length}</p>
+          <p className="text-3xl font-bold text-red-600 mt-2">{users.filter((u) => u.status === "SUSPENDED").length}</p>
         </Card>
       </div>
 
@@ -212,10 +209,10 @@ export default function UsersPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[#ff6600] flex items-center justify-center text-white font-semibold">
-                        {user.name.charAt(0)}
+                        {user.fullName.charAt(0)}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
                         <p className="text-xs text-gray-500">Joined {user.createdAt}</p>
                       </div>
                     </div>
@@ -227,7 +224,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-                        user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
+                        user.role === "ADMIN" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
                       }`}
                     >
                       {user.role}
@@ -236,7 +233,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-                        user.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        user.status === "ACTIVE" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                       }`}
                     >
                       {user.status}
@@ -251,13 +248,13 @@ export default function UsersPage() {
                         size="sm"
                         onClick={() => handleToggleStatus(user.id)}
                         className={
-                          user.status === "active"
+                          user.status === "ACTIVE"
                             ? "text-red-600 hover:text-red-700 hover:bg-red-50"
                             : "text-green-600 hover:text-green-700 hover:bg-green-50"
                         }
-                        title={user.status === "active" ? "Ban user" : "Activate user"}
+                        title={user.status === "ACTIVE" ? "Ban user" : "Activate user"}
                       >
-                        {user.status === "active" ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+                        {user.status === "ACTIVE" ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
                       </Button>
                       <Button
                         variant="ghost"
@@ -272,7 +269,7 @@ export default function UsersPage() {
                         size="sm"
                         onClick={() => handleDelete(user.id)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        disabled={user.role === "admin"}
+                        disabled={user.role === "ADMIN"}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -294,9 +291,9 @@ export default function UsersPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Hoàng Phong"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="Tên đầy đủ"
                   required
                 />
               </div>
@@ -316,41 +313,18 @@ export default function UsersPage() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="+84 123 456 789"
-                  required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password {editingUser && "(leave blank to keep current)"}
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder={editingUser ? "Enter new password" : "Enter password (min 6 characters)"}
-                    required={!editingUser}
-                    minLength={6}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {!editingUser && <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as "admin" | "user" })}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value as "ADMIN" | "STAFF" | "CUSTOMER" })}
                   className="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6600]"
                 >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
+                  <option value="CUSTOMER">Customer</option>
+                  <option value="STAFF">Staff</option>
+                  <option value="ADMIN">Admin</option>
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
@@ -358,7 +332,7 @@ export default function UsersPage() {
                   Cancel
                 </Button>
                 <Button type="submit" className="flex-1 bg-[#ff6600] hover:bg-[#ff5500]">
-                  {editingUser ? "Update" : "Create"}
+                  {editingUser ? "Update" : "Select an User"}
                 </Button>
               </div>
             </form>

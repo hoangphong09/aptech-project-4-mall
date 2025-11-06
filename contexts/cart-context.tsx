@@ -1,6 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { useSession } from "next-auth/react"
+import { cartApi, type AddToCartPayload } from "@/lib/service/cartApi";
 
 export interface CartItem {
   id: string
@@ -32,19 +34,25 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
+  const { data:session } = useSession();
 
-  // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart")
-    if (savedCart) {
+    const fetchCarts = async () => {
+      if (!session?.user.id) return;
+      const savedCart = await cartApi.getCart(session?.user.id);
+
+      if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart))
+        setItems(savedCart.items)
       } catch (error) {
-        console.error("[v0] Failed to load cart from localStorage:", error)
+        console.error("[v0] Failed to load cart:", error)
       }
     }
     setIsLoaded(true)
-  }, [])
+    }
+
+    fetchCarts();
+  }, [session])
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -53,29 +61,57 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isLoaded])
 
-  const addToCart = (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
-    setItems((prevItems) => {
-      const newItem = { ...item, quantity: item.quantity || 1 }
-      return [...prevItems, newItem]
-    })
+  const addToCart = async (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
+    const payload: AddToCartPayload = { 
+      productId: item.id, 
+      quantity: item.quantity || 1,
+      selectedSize: item.selectedSize,
+      selectedColor: item.selectedColor
+    };
+
+    if (session?.user?.id) {
+      const cart = await cartApi.addToCart(session.user.id, payload);
+      setItems(cart.items);
+    } else {
+      setItems(prev => [...prev, { ...item, quantity: item.quantity || 1 }]);
+    }
   }
 
-  const removeFromCart = (index: number) => {
-    setItems((prevItems) => prevItems.filter((_, i) => i !== index))
-  }
-
-  const updateQuantity = (index: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(index)
-      return
+  const updateQuantity = async (index: number, quantity: number) => {
+    const item = items[index];
+    if (!item) return;
+    if (!session?.user?.id) {
+      // fallback
+      setItems(prev => prev.map((it, i) => (i === index ? { ...it, quantity } : it)));
+      return;
     }
 
-    setItems((prevItems) => prevItems.map((item, i) => (i === index ? { ...item, quantity } : item)))
-  }
+    const cart = await cartApi.updateItem(session.user.id, item.id, { quantity });
+    setItems(cart.items);
+  };
 
-  const clearCart = () => {
-    setItems([])
-  }
+  const removeFromCart = async (index: number) => {
+    const item = items[index];
+    if (!item) return;
+    if (!session?.user?.id) {
+      setItems(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
+
+    const cart = await cartApi.removeItem(session.user.id, item.id);
+    setItems(cart.items);
+  };
+
+  const clearCart = async () => {
+    if (!session?.user?.id) {
+      setItems([]);
+      return;
+    }
+
+    const cart = await cartApi.clearCart(session.user.id);
+    setItems(cart.items);
+  };
+
 
   const getTotalItems = () => {
     return items.reduce((total, item) => total + item.quantity, 0)

@@ -1,147 +1,117 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { useRouter } from "next/navigation"
-
-interface User {
-  id: string
-  email: string
-  name: string
-  role: "admin" | "user"
-  password?: string // Added password field for user management
-}
+import { createContext, useContext, ReactNode, useMemo } from "react"
+import { useSession } from "next-auth/react"
+import { axiosAuth } from "@/lib/axios"
 
 interface AuthContextType {
-  user: User | null
-  login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
+  user: SessionUser | null
   isAdmin: boolean
   isLoading: boolean
-  getAllUsers: () => User[]
-  createUser: (user: User) => void
+  getAllUsers: () => Promise<User[]>
   updateUser: (id: string, updates: Partial<User>) => void
   deleteUser: (id: string) => void
 }
 
+export interface SessionUser {
+  id: number;
+  username?: string;
+  fullname: string;
+  email: string;
+  role: string;
+  status: string;
+  accessToken: string;
+  accessTokenExpires?: string;
+  provider?: string;
+}
+
+interface User {
+  phone: string
+  id: number
+  username: string
+  email: string
+  fullName: string
+  role: string
+  status: string
+  avatarUrl?: string
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const INITIAL_USERS: User[] = [
-  {
-    id: "admin-001",
-    email: "admin@pandamall.com",
-    name: "Admin User",
-    role: "admin",
-    password: "admin123",
-  },
-  {
-    id: "user-001",
-    email: "demo@example.com",
-    name: "Demo User",
-    role: "user",
-    password: "demo123",
-  },
-]
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [allUsers, setAllUsers] = useState<User[]>([])
-  const router = useRouter()
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const savedUsers = localStorage.getItem("allUsers")
-    if (savedUsers) {
-      try {
-        setAllUsers(JSON.parse(savedUsers))
-      } catch (error) {
-        console.error("Failed to parse saved users:", error)
-        localStorage.setItem("allUsers", JSON.stringify(INITIAL_USERS))
-        setAllUsers(INITIAL_USERS)
+  const user = session?.user
+    ? {
+        id: userIdFrom(session.user),
+        username: session.user.username,
+        fullname: session.user.fullname,
+        email: session.user.email,
+        role: session.user.role,
+        status: session.user.status,
+        accessToken: (session.user as any).accessToken,
+        accessTokenExpires: (session.user as any).accessTokenExpires,
+        provider: (session.user as any).provider,
       }
-    } else {
-      localStorage.setItem("allUsers", JSON.stringify(INITIAL_USERS))
-      setAllUsers(INITIAL_USERS)
-    }
+    : null
 
-    // Check if user is logged in from localStorage
-    const savedUser = localStorage.getItem("user")
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser)
-        // Remove password from logged-in user object
-        const { password, ...userWithoutPassword } = parsedUser
-        setUser(userWithoutPassword)
-      } catch (error) {
-        console.error("Failed to parse saved user:", error)
-        localStorage.removeItem("user")
-      }
-    }
-    setIsLoading(false)
-  }, [])
+  const isAdmin = user?.role === "ADMIN"
+  const isStaff = user?.role === "STAFF"
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    const foundUser = allUsers.find((u) => u.email === email && u.password === password)
+  const getAllUsers = async (): Promise<User[]> => {
+    if (!user?.accessToken) throw new Error("No access token available")
 
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser
-      setUser(userWithoutPassword)
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-      return true
-    }
-
-    return false
+    const res = await axiosAuth.get("/api/users/", {
+      headers: {
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+    })
+    return res.data;
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
-    router.push("/")
+  const updateUser = async (id: string, updates: Partial<User>): Promise<void> => {
+  if (!user?.accessToken) throw new Error("No access token available")
+
+  await axiosAuth.patch(`/api/users/${id}`, updates, {
+    headers: {
+      Authorization: `Bearer ${user.accessToken}`,
+    },
+  })
   }
 
-  const getAllUsers = () => {
-    return allUsers
+  const deleteUser = async (id: string): Promise<void> => {
+  if (!user?.accessToken) throw new Error("No access token available")
+
+  await axiosAuth.delete(`/api/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${user.accessToken}`,
+    },
+    })
   }
 
-  const createUser = (newUser: User) => {
-    const updatedUsers = [...allUsers, newUser]
-    setAllUsers(updatedUsers)
-    localStorage.setItem("allUsers", JSON.stringify(updatedUsers))
-  }
-
-  const updateUser = (id: string, updates: Partial<User>) => {
-    const updatedUsers = allUsers.map((u) => (u.id === id ? { ...u, ...updates } : u))
-    setAllUsers(updatedUsers)
-    localStorage.setItem("allUsers", JSON.stringify(updatedUsers))
-
-    // If updating current user, update the logged-in user state
-    if (user?.id === id) {
-      const { password, ...userWithoutPassword } = updatedUsers.find((u) => u.id === id)!
-      setUser(userWithoutPassword)
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-    }
-  }
-
-  const deleteUser = (id: string) => {
-    const updatedUsers = allUsers.filter((u) => u.id !== id)
-    setAllUsers(updatedUsers)
-    localStorage.setItem("allUsers", JSON.stringify(updatedUsers))
-  }
-
-  const isAdmin = user?.role === "admin"
-
-  return (
-    <AuthContext.Provider
-      value={{ user, login, logout, isAdmin, isLoading, getAllUsers, createUser, updateUser, deleteUser }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      isAdmin,
+      isLoading: status === "loading",
+      getAllUsers,
+      updateUser,
+      deleteUser
+    }),
+    [user, isAdmin, isStaff, status]
   )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
+}
+
+function userIdFrom(user: any) {
+  return user?.id || user?.username || "unknown"
 }

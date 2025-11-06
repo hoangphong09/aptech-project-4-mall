@@ -44,8 +44,9 @@ export default function BrandSection({ title, brands, productIds }: BrandSection
     }
   }
 
-  const getDiscountPercentage = (price: string, originalPrice: string) => {
+  const getDiscountPercentage = (price: string, originalPrice?: string) => {
     const priceNum = Number.parseFloat(price)
+    if (!originalPrice) return 0
     const originalNum = Number.parseFloat(originalPrice)
     if (originalNum > priceNum) {
       return Math.round(((originalNum - priceNum) / originalNum) * 100)
@@ -118,7 +119,7 @@ export default function BrandSection({ title, brands, productIds }: BrandSection
           {products.map((product) => {
             const discount = getDiscountPercentage(product.price, product.original_price)
             const priceInVND = Math.round(Number.parseFloat(product.price) * 1000)
-            const originalPriceInYuan = Math.round(Number.parseFloat(product.original_price) / 1000)
+            const originalPriceInYuan = product.original_price ? Math.round(Number.parseFloat(product.original_price) / 1000) : undefined
 
             return (
               <Link key={product.item_id} href={`/product/${product.item_id}`} className="flex-shrink-0 w-[300px]">
@@ -176,7 +177,7 @@ export default function BrandSection({ title, brands, productIds }: BrandSection
                       <div className="text-transparent bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text font-bold text-2xl mb-1.5">
                         {priceInVND.toLocaleString()} đ
                       </div>
-                      <div className="text-gray-400 text-sm line-through font-medium">¥{originalPriceInYuan}</div>
+                      {originalPriceInYuan ? <div className="text-gray-400 text-sm line-through font-medium">¥{originalPriceInYuan}</div> : <div/> }
                     </div>
                   </div>
                 </Card>
